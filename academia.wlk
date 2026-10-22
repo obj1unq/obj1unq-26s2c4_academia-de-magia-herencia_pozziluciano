@@ -2,8 +2,12 @@
 object academiaDeMagia {
 	const property muebles = []
 	
+	method guardarCosa(unaCosa) {
+		if (self.sePuedeGuardarEnLaAcademia(unaCosa)) {self.mueblesDondePuedeGuardarse(unaCosa).anyOne().guardar(unaCosa)}
+	}
+
 	method sePuedeGuardarEnLaAcademia(unaCosa) {
-		self.noEstaEnLaAcademia(unaCosa) && muebles.any{mueble => mueble.sePuedeGuardar(unaCosa)}
+		return self.noEstaEnLaAcademia(unaCosa) && muebles.any{mueble => mueble.sePuedeGuardar(unaCosa)}
 	}
 
 	method muebleDondeEsta(unaCosa) {
@@ -14,8 +18,13 @@ object academiaDeMagia {
 		return muebles.all{mueble => mueble.noEstaYaGuardada(unaCosa)}
 	}
 
-	
+	method mueblesDondePuedeGuardarse(unaCosa) {
+		return if (self.noEstaEnLaAcademia(unaCosa)) {muebles.filter{mueble => mueble.sePuedeGuardar(unaCosa)}}
+			else []
+	}
 
+	
+}
 
 class Cosa {
 	const property marca
@@ -26,6 +35,10 @@ class Cosa {
 
 class Mueble {
 	var property cosas
+
+	method guardar(unaCosa) {
+		cosas.add(unaCosa)
+	}
 
 	method sePuedeGuardar(unaCosa)
 
