@@ -31,12 +31,47 @@ class Cosa {
 	const property volumen
 	const property esReliquia
 	const property esMagica
+
+	method utilidad() {
+		return volumen + self.tresSiEsMagica() + self.cincoSiEsReliquia() + marca.loQueAportaLaMarca(self)
+	}
+
+	method tresSiEsMagica() {
+		return if(esMagica) {3} else {0}
+	}
+
+	method cincoSiEsReliquia() {
+		return if(esReliquia) {5} else {0}
+	}
 }
 
+class Marca {
+	method loQueAportaLaMarca(unaCosa)
+}
+
+class Fenix inherits Marca {
+	override method loQueAportaLaMarca(unaCosa) {
+		return if (unaCosa.esReliquia()) {3} else {0}
+	}
+}
+
+class Acme inherits Marca {
+	override method loQueAportaLaMarca(unaCosa) {
+		return unaCosa.volumen() / 2
+	}
+}
+
+class Cuchuflito inherits Marca {
+	override method loQueAportaLaMarca(unaCosa) {
+		return 0
+	}
+}
 class Mueble {
 	var property cosas
+	
 
 	method guardar(unaCosa) {
+		if (self.sePuedeGuardar(unaCosa) && self.noEstaYaGuardada(unaCosa))
 		cosas.add(unaCosa)
 	}
 
@@ -49,7 +84,16 @@ class Mueble {
 	method estaGuardada(unaCosa) {
 		return cosas.contains(unaCosa)
 	}
+
+	method utilidadMueble() {
+		return self.utilidadDelContenido() / self.precio()  
+	}
+
+	method utilidadDelContenido() {
+		return cosas.sum{cosa => cosa.utilidad()} 
+	}
 	
+	method precio()
 }
 
 class Armario inherits Mueble {
@@ -62,6 +106,12 @@ class Armario inherits Mueble {
 	method cantCosasGuardadas() {
 		return cosas.count()
 	}
+
+	override method precio() {
+		return cantMaxCosas * 5
+	}
+
+
 }
 
 class Baul inherits Mueble {
@@ -74,10 +124,38 @@ class Baul inherits Mueble {
 	method volumenTotal() {
 		return cosas.sum{cosa => cosa.volumen()}
 	}
+
+	override method precio() {
+		return volumenMax + 2
+	}
 }
 
 class Gabinete inherits Mueble{
+
+	const precio
 	override method sePuedeGuardar(unaCosa) {
 		return unaCosa.esMagica()
+	}
+
+	override method precio() {
+		return precio
+	}
+
+	method sonTodasReliquias() {
+		return cosas.all{cosa => cosa.esReliquia()}
+	}
+
+	method dosSiSonTodasReliquias() {
+		return if (self.sonTodasReliquias()) {2} else {0}
+	}
+
+	override method utilidadMueble() {
+		return ( self.utilidadDelContenido() / self.precio() ) + self.dosSiSonTodasReliquias() 
+	}
+}
+
+class BaulMagico inherits Baul {
+	override method utilidadMueble() {
+		return ( self.utilidadDelContenido() / self.precio() ) + self.dosSiSonTodasReliquias() 
 	}
 }
